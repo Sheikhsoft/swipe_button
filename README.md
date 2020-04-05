@@ -32,6 +32,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  final swipeController = SwipeController();
  
   @override
   Widget build(BuildContext context) {
@@ -40,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
                          child: Padding(
                            padding: const EdgeInsets.all(24.0),
                            child: SwipeButton(
+                             swipeController: swipeController,
                              thumb: Row(
                                mainAxisAlignment: MainAxisAlignment.center,
                                children: <Widget>[
@@ -61,7 +63,10 @@ class _MyHomePageState extends State<MyHomePage> {
                              onChanged: (result) {
                                if (result == SwipePosition.SwipeRight) {
                                  Navigator.pushNamed(context, pageRoute);
-                               } else {}
+                               } else {
+                                 // optional
+                                 //swipeController.reset();
+                               }
                              },
                            ),
                          ),

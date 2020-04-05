@@ -8,6 +8,23 @@ enum SwipePosition {
   SwipeRight,
 }
 
+/// Controller which allow us to reset the swipe button.
+class SwipeController {
+  AnimationController _controller;
+
+  void _attachController(AnimationController controller) =>
+      _controller = controller;
+
+  /// Reset the Swipe button using a smooth animation
+  /// Set the duration what you want
+  void reset({Duration duration = const Duration(milliseconds: 600)}) {
+    assert(_controller != null,
+        'SwipeController was not attached to the SwipeButton');
+    _controller.duration = duration;
+    _controller.reverse();
+  }
+}
+
 class SwipeButton extends StatefulWidget {
   const SwipeButton({
     Key key,
@@ -16,6 +33,7 @@ class SwipeButton extends StatefulWidget {
     BorderRadius borderRadius,
     this.initialPosition = SwipePosition.SwipeLeft,
     @required this.onChanged,
+    this.swipeController,
     this.height = 56.0,
   })  : assert(initialPosition != null && onChanged != null && height != null),
         this.borderRadius = borderRadius ?? BorderRadius.zero,
@@ -27,6 +45,7 @@ class SwipeButton extends StatefulWidget {
   final double height;
   final SwipePosition initialPosition;
   final ValueChanged<SwipePosition> onChanged;
+  final SwipeController swipeController;
 
   @override
   SwipeButtonState createState() => SwipeButtonState();
@@ -48,12 +67,13 @@ class SwipeButtonState extends State<SwipeButton>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController.unbounded(vsync: this);
+    _controller = AnimationController(vsync: this);
     _contentAnimation = Tween<double>(begin: 1.0, end: 0.0)
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     if (widget.initialPosition == SwipePosition.SwipeRight) {
       _controller.value = 1.0;
     }
+    widget.swipeController?._attachController(_controller);
   }
 
   @override
@@ -96,6 +116,7 @@ class SwipeButtonState extends State<SwipeButton>
           AnimatedBuilder(
             animation: _controller,
             builder: (BuildContext context, Widget child) {
+              print(_controller.value);
               return Align(
                 alignment: Alignment((_controller.value * 2.0) - 1.0, 0.0),
                 child: child,
